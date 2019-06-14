@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="dist/css/bootstrap.css">
+</head>
+<body>
+    <form action="/page1/" method="POST">
+        {% csrf_token %}
+
+        <input type="radio" name="choose goods" value="拿铁"checked="checked">拿铁  1元/杯</input>
+        <br>
+
+        <input type="radio" name="choose goods" value="咖啡">咖啡  2元/杯</input>
+        <br>
+
+        <input type="radio" name="choose goods" value="奶茶">奶茶  3元/杯</input>
+        <br><br>
+        <input type="submit" value="去支付" />
+    </form>
+    <br>
+    <hr>
+    <form action="/page1_1/" method="POST">
+        {% csrf_token %}
+        <input type="text" name="money" value="1.5">
+        <input type="submit" value="自定义支付" />
+    </form>
+<script></script>
+</body>
+</html>
