@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, HttpResponse
 from utils.pay import AliPay
 import json
 import time
-
+from datetime import datetime
 
 def get_ali_object():
     # 沙箱环境地址：https://openhome.alipay.com/platform/appDaily.htm?tab=info
@@ -43,16 +43,17 @@ def page1(request):
     if goods!="":
         money = goods_dir[goods]
         alipay = get_ali_object()
-
+        subject = "达神的商品: 一杯%s"%goods
+        out_trade_no = "x2" + str(time.time())
+        global payinfo
+        payinfo = {"金额": money, "商品": subject,"订单号": out_trade_no,"商品名":goods}
         # 生成支付的url
         query_params = alipay.direct_pay(
-            subject="达神的商品: 一杯%s"%goods,  # 商品简单描述
-            out_trade_no="x2" + str(time.time()),  # 用户购买的商品订单号（每次不一样） 20180301073422891
-            total_amount=money,  # 交易金额(单位: 元 保留俩位小数)
+            subject=subject,# 商品简单描述
+            out_trade_no=out_trade_no,# 用户购买的商品订单号（每次不一样） 20180301073422891
+            total_amount=money,# 交易金额(单位: 元 保留俩位小数)
         )
-
         pay_url = "https://openapi.alipaydev.com/gateway.do?{0}".format(query_params)  # 支付宝网关地址（沙箱应用）
-
         return redirect(pay_url)
 
 def page1_1(request):
@@ -106,6 +107,23 @@ def page2(request):
         print('==================开始==================')
         print('GET验证', status)
         print('==================结束==================')
-        return HttpResponse('支付成功')
+        # return HttpResponse('支付成功')
+        seller = "达神互联科技有限公司"
+        payway = "支付宝"
+        i = datetime.now()
+        trade_time = "{}年{}月{}日{}时{}分{}秒".format(i.year, i.month, i.day, i.hour, i.minute, i.second)
+        print(trade_time)
+        global payinfo
+        html = "支付成功!付款信息如下:<br>\
+        <table border='1'>\
+        <tr><td>商品名</td> <td>{}</td></tr>\
+        <tr><td>商品详情</td> <td>{}</td></tr>\
+        <tr><td>订单号</td> <td>{}</td></tr>\
+        <tr><td>付款金额</td> <td>{}</td></tr>\
+        <tr><td>收款方</td> <td>{}</td></tr>\
+        <tr><td>交易时间</td> <td>{}</td></tr>\
+        <tr><td>付款方式</td> <td>{}</td></tr>\
+        </table>".format(payinfo["商品名"],payinfo["商品"],payinfo["订单号"],payinfo["金额"],seller,trade_time,payway)
+        return HttpResponse(html)
 
 
